@@ -70,7 +70,7 @@ Chaque utilisateur dispose d’un accès selon son rôle, lui permettant de cons
 
 \- Mise à jour du statut par les utilisateurs pour faciliter le suivi
 
-\- Ajout de ressources (images, documents, photos) pour faciliter l’exécution
+\- Ajout de ressources non relationnelles (images, documents, photos) pour faciliter l’exécution
 
 
 
