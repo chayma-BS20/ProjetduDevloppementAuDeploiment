@@ -1,74 +1,32 @@
-package org.example.entities;   // adapte si nécessaire
+package org.example.entities;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.JoinColumn;
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 
 @Entity
+@Data               // Génère les getters, setters, toString, equals et hashCode
+@NoArgsConstructor  // Constructeur sans arguments
+@AllArgsConstructor // Constructeur avec tous les arguments
 public class Team {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long teamId;          // <--- CLÉ PRIMAIRE OBLIGATOIRE
+    private Long teamId;
 
     private String name;
     private String description;
 
-    @ManyToOne
-    @JoinColumn(name = "project_id")
-    private Project project;      // si une équipe appartient à un projet
+    // Relation 1:N vers User (members)
+    // mappedBy="team" pointe vers la propriété 'team' dans la classe User.java
+    @OneToMany(mappedBy = "team", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<User> members;
 
-    @OneToMany(mappedBy = "team")
-    private List<User> members;   // si tu as User.team dans ta classe User
-
-    public Team() {
-    }
-
-    // Getters / setters
-
-    public Long getTeamId() {
-        return teamId;
-    }
-
-    public void setTeamId(Long teamId) {
-        this.teamId = teamId;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public Project getProject() {
-        return project;
-    }
-
-    public void setProject(Project project) {
-        this.project = project;
-    }
-
-    public List<User> getMembers() {
-        return members;
-    }
-
-    public void setMembers(List<User> members) {
-        this.members = members;
-    }
+    // Relation 1:N vers Project
+    // mappedBy="team" pointe vers la propriété 'team' dans la classe Project.java
+    @OneToMany(mappedBy = "team", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<Project> projects;
 }

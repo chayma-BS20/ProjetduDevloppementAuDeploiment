@@ -1,35 +1,42 @@
 package org.example.entities;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
-import jakarta.persistence.Id;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import java.util.List;
+
+// IMPORTS EXPLICITES POUR ÉVITER LE CONFLIT
+import org.example.entities.Task;
+import org.example.entities.Role;
+import org.example.entities.Team;
 
 @Entity
-@Table(name = "users")
+@Table(name = "user")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;     // <-- CLÉ PRIMAIRE
+    private Long userId;
 
     private String username;
     private String email;
     private String password;
+    private String phoneNumber;
+    private String address;
 
-    public User() {
-    }
+    @ManyToOne
+    @JoinColumn(name = "role_id")
+    private Role role;
 
-    // getters / setters …
+    @ManyToOne
+    @JoinColumn(name = "team_id")
+    private Team team;
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    // autres getters/setters...
+    // La relation est vers notre classe Task importée ci-dessus.
+    @OneToMany(mappedBy = "assignee", fetch = FetchType.LAZY)
+    private List<Task> assignedTasks;
 }

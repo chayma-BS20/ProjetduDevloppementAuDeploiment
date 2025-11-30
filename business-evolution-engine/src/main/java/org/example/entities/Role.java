@@ -1,51 +1,26 @@
-package org.example.entities; // ou tn.bee.security.entities si tu as changé
-
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
+package org.example.entities;
+import  org.example.entities.User;
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 
 @Entity
+@Data // Getters, Setters, toString, equals/hashCode
+@NoArgsConstructor // Constructeur sans arguments
+@AllArgsConstructor // Constructeur avec tous les arguments
 public class Role {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long roleId;   // <-- CLÉ PRIMAIRE
+    private Long roleId;
 
-    private String name;
+    private String title; // Correction: 'title' au lieu de 'name' basé sur le diagramme
+    private String description;
 
-    @OneToMany(mappedBy = "role")
-    private List<User> users;   // seulement si tu as la relation User.role
-
-    public Role() {
-    }
-
-    // Getters / setters
-
-    public Long getRoleId() {
-        return roleId;
-    }
-
-    public void setRoleId(Long roleId) {
-        this.roleId = roleId;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public List<User> getUsers() {
-        return users;
-    }
-
-    public void setUsers(List<User> users) {
-        this.users = users;
-    }
+    // Relation Bidirectionnelle One-to-Many : MappedBy doit pointer vers la propriété 'role' dans User
+    @OneToMany(mappedBy = "role", fetch = FetchType.LAZY)
+    private List<User> users;
 }
