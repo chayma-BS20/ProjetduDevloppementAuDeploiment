@@ -19,7 +19,6 @@ public class Ressource {
     private String description;
     private String type;
 
-    // Relation Many-to-One vers Project (Une ressource appartient à un seul projet)
     @ManyToOne
     @JoinColumn(name = "project_id")
     private Project project;
