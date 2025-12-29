@@ -44,7 +44,10 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authz -> authz
-                        .requestMatchers("/api/auth/**", "/api/users/**", "/api/roles/**", "/api/teams/**").permitAll()
+                        .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/api/roles/**", "/api/users/**").hasRole("Manager")
+                        .requestMatchers("/api/teams/**", "/api/projects/**").hasAnyRole("Manager", "Chef d equipe")
+                        .requestMatchers("/api/users/**").hasAnyRole("Manager", "Chef d equipe")
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
