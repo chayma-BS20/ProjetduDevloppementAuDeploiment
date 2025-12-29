@@ -1,6 +1,7 @@
 package org.example.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -31,15 +32,14 @@ public class User {
 
     @ManyToOne
     @JoinColumn(name = "role_id")
-    @JsonIgnore
+    @JsonProperty(access = JsonProperty.Access.READ_WRITE)
     private Role role;
 
     @ManyToOne
-    @JoinColumn(name = "team_id")
-    @JsonIgnore
+    @JoinColumn(name = "team_id", nullable = true)
+    @JsonProperty(access = JsonProperty.Access.READ_WRITE)
     private Team team;
 
-    // La relation est vers notre classe Task importée ci-dessus.
     @OneToMany(mappedBy = "assignee", fetch = FetchType.LAZY)
     @JsonIgnore
     private List<Task> assignedTasks;

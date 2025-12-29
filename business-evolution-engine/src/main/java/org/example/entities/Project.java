@@ -1,4 +1,5 @@
 package org.example.entities;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 
@@ -29,14 +30,16 @@ public class Project {
     private String status;
     private double budget;
 
-    @ManyToOne
-    @JoinColumn(name = "team_id")
+    @OneToOne
+    @JoinColumn(name = "team_id", unique = true)
     private Team team;
 
+
     @OneToMany(mappedBy = "project", fetch = FetchType.LAZY)
+    @JsonIgnore
     private List<Task> tasks;
 
     @OneToMany(mappedBy = "project", fetch = FetchType.LAZY)
-    @JsonManagedReference
+    @JsonIgnore
     private List<Ressource> resources;
 }
