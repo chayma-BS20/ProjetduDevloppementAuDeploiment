@@ -20,19 +20,18 @@ public class Task {
     private String title;
     private String description;
 
-    // Utilisation de LocalDateTime pour la date et l'heure de l'échéance
+
     private LocalDateTime dueDateTime;
 
     private String status;
     private int priority;
 
-    // Relation Many-to-One vers Project (Une tâche appartient à un seul projet)
+
     @ManyToOne
-    @JoinColumn(name = "project_id") // Clé étrangère dans la table Task
+    @JoinColumn(name = "project_id")
     private Project project;
 
-    // Relation Many-to-One vers User (L'utilisateur assigné à cette tâche)
     @ManyToOne
-    @JoinColumn(name = "assignee_user_id") // Clé étrangère vers la table User
+    @JoinColumn(name = "assignee_user_id")
     private User assignee;
 }
