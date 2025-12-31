@@ -1,4 +1,8 @@
 package org.example.repositories;
 
-public class ProjectRepository {
+import org.example.entities.Project;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface ProjectRepository extends JpaRepository<Project, Long> {
+    boolean existsByTeam_TeamId(Long teamId);
 }
