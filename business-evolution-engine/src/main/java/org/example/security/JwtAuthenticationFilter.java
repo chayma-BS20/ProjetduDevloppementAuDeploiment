@@ -2,6 +2,7 @@ package org.example.security;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -26,7 +28,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Autowired
     private UserDetailsService userDetailsService;
 
-    private static final String SECRET_KEY = "my-secret-key";
+    private static final String SECRET_KEY = "mySecretKeyMustBe32CharsMinimum1234567890ABCDEF";
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
@@ -37,11 +39,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             String token = authHeader.substring(7);
 
             try {
-                Claims claims = Jwts.parser().setSigningKey(SECRET_KEY)
-                        .parseClaimsJws(token).getBody();
+                Claims claims = Jwts.parserBuilder()  // ✅ 0.11.5
+                        .setSigningKey(Keys.hmacShaKeyFor(SECRET_KEY.getBytes(StandardCharsets.UTF_8)))
+                        .build()
+                        .parseClaimsJws(token)
+                        .getBody();
 
                 String email = claims.getSubject();
-                String roles = (String) claims.get("roles");
+                String roles = claims.get("roles", String.class);
 
                 List<SimpleGrantedAuthority> authorities = Arrays.stream(roles.split(","))
                         .map(SimpleGrantedAuthority::new)
@@ -55,11 +60,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 SecurityContextHolder.getContext().setAuthentication(authToken);
 
             } catch (Exception e) {
-                // token invalide ou expiré
                 SecurityContextHolder.clearContext();
             }
         }
-
         filterChain.doFilter(request, response);
     }
 }
