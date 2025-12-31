@@ -38,6 +38,7 @@ public class SecurityConfig {
         return config.getAuthenticationManager();
     }
 
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http, JwtAuthenticationFilter jwtFilter) throws Exception {
         http
@@ -45,14 +46,24 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authz -> authz
                         .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers("/api/roles/**", "/api/users/**").hasRole("Manager")
-                        .requestMatchers("/api/teams/**", "/api/projects/**").hasAnyRole("Manager", "Chef d equipe")
-                        .requestMatchers("/api/users/**").hasAnyRole("Manager", "Chef d equipe")
+
+                        // ✅ FIX : "ROLE_Manager" → hasRole('MANAGER')
+                        .requestMatchers("/api/roles/**", "/api/users/**").hasRole("MANAGER")
+
+                        // ✅ FIX : "ROLE_Chef d equipe" → hasRole('Chef d equipe')
+                        .requestMatchers("/api/teams/**", "/api/projects/**").hasAnyRole("MANAGER", "CHEF D EQUIPE")
+
+                        // ✅ MEMBRES voient leur équipe
+                        .requestMatchers("/api/users/my-team", "/api/users/team/**").hasAnyRole("MANAGER", "CHEF D EQUIPE", "MEMBRE")
+
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
+
+
+
 
 }
