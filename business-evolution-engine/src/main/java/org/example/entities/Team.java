@@ -25,9 +25,8 @@ public class Team {
     @JsonIgnore
     private List<User> members;
 
-
-    @OneToOne
-    @JoinColumn(name = "project_id", unique = true)
+    @OneToOne(mappedBy = "team")
+    @JsonIgnore // éviter boucle JSON Team->Project->Team
     private Project project;
 
 }
