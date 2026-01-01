@@ -3,8 +3,12 @@ package org.example.services;
 import lombok.RequiredArgsConstructor;
 import org.example.entities.Project;
 import org.example.entities.Team;
+import org.example.entities.User;
 import org.example.repositories.ProjectRepository;
 import org.example.repositories.TeamRepository;
+import org.example.repositories.UserRepository;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,13 +19,14 @@ public class ProjectService {
 
     private final ProjectRepository projectRepository;
     private final TeamRepository teamRepository;
+    private final UserRepository userRepository;
 
     // CREATE
     public Project create(Project project, Long teamId) {
         Team team = teamRepository.findById(teamId)
                 .orElseThrow(() -> new RuntimeException("Team not found with id: " + teamId));
 
-        // Empêcher qu'une team ait déjà un project (en plus du unique=true)
+        // Empêcher qu'une team ait déjà un projet
         if (projectRepository.existsByTeam_TeamId(teamId)) {
             throw new RuntimeException("This team already has a project.");
         }
@@ -76,4 +81,27 @@ public class ProjectService {
         }
         projectRepository.deleteById(id);
     }
+
+    // Vérifie si l’utilisateur est manager ou chef de projet de la team du projet
+    public boolean isChefOrManagerOfProject(Long projectId) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String email = auth.getName();
+
+        User currentUser = userRepository.findByEmail(email).orElse(null);
+        if (currentUser == null || currentUser.getRole() == null) return false;
+
+        Project project = projectRepository.findById(projectId).orElse(null);
+        if (project == null || project.getTeam() == null) return false;
+
+        // MANAGER → accès total
+        if ("MANAGER".equals(currentUser.getRole().getTitle())) {
+            return true;
+        }
+
+        // CHEF_D_EQUIPE → seulement son équipe
+        return "CHEF_D_EQUIPE".equals(currentUser.getRole().getTitle())
+                && currentUser.getTeam() != null
+                && currentUser.getTeam().getTeamId().equals(project.getTeam().getTeamId());
+    }
+
 }

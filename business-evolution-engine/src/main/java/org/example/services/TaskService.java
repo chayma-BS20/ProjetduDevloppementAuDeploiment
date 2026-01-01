@@ -7,6 +7,8 @@ import org.example.entities.User;
 import org.example.repositories.ProjectRepository;
 import org.example.repositories.TaskRepository;
 import org.example.repositories.UserRepository;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -79,4 +81,38 @@ public class TaskService {
         }
         taskRepository.deleteById(id);
     }
+    // Vérifie si l'utilisateur peut modifier la tâche
+    public boolean canModifyTask(Long taskId) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String email = auth.getName();
+
+        Task task = taskRepository.findById(taskId).orElse(null);
+        if (task == null || task.getProject() == null || task.getProject().getTeam() == null) return false;
+
+        User currentUser = userRepository.findByEmail(email).orElse(null);
+        if (currentUser == null || currentUser.getRole() == null) return false;
+
+        String role = currentUser.getRole().getTitle();
+
+        // MANAGER → accès total
+        if ("MANAGER".equals(role)) return true;
+
+        // CHEF_D_EQUIPE → uniquement pour les tâches de son équipe
+        return "CHEF_D_EQUIPE".equals(role) &&
+                currentUser.getTeam() != null &&
+                currentUser.getTeam().getTeamId().equals(task.getProject().getTeam().getTeamId());
+    }
+
+    // Vérifie si l'utilisateur peut assigner la tâche
+    public boolean canAssignTask(Long taskId) {
+        // Même logique que update
+        return canModifyTask(taskId);
+    }
+
+    // Vérifie si l'utilisateur peut supprimer la tâche
+    public boolean canDeleteTask(Long taskId) {
+        // Même logique que update
+        return canModifyTask(taskId);
+    }
+
 }

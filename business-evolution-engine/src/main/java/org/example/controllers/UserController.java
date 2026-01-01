@@ -54,7 +54,7 @@ public class UserController {
         }
 
         // ✅ LOGIQUE MANAGER : pas d'équipe
-        if (finalRole != null && ("Manager".equals(finalRole.getTitle()) || "MANAGER".equals(finalRole.getTitle()))) {
+        if (finalRole != null && ("MANAGER".equals(finalRole.getTitle()) || "MANAGER".equals(finalRole.getTitle()))) {
             user.setTeam(null);
         }
 
@@ -115,37 +115,6 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
 
-    // ✅ TOUS peuvent voir MEMBRES de LEUR équipe
-    @PreAuthorize("hasAnyRole('MANAGER', 'CHEF_D_EQUIPE', 'MEMBRE')")
-    @GetMapping("/my-team")
-    public List<User> getMyTeamMembers() {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String email = auth.getName();
-        User currentUser = userRepository.findByEmail(email)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
-
-        if (currentUser.getTeam() == null) {
-            return Collections.emptyList();
-        }
-        return userRepository.findByTeamTeamId(currentUser.getTeam().getTeamId());
-    }
-
-    // ✅ TOUS peuvent voir LEUR équipe (vérif teamId)
-    @PreAuthorize("hasAnyRole('MANAGER', 'CHEF_D_EQUIPE', 'MEMBRE')")
-    @GetMapping("/team/{teamId}")
-    public List<User> getUsersByTeam(@PathVariable Long teamId) {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String email = auth.getName();
-        User currentUser = userRepository.findByEmail(email)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-
-        if (currentUser.getTeam() == null || !currentUser.getTeam().getTeamId().equals(teamId)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied to this team");
-        }
-        return userRepository.findByTeamTeamId(teamId);
-    }
-
-    // ✅ Recherches spécifiques (MANAGER only)
     @PreAuthorize("hasRole('MANAGER')")
     @GetMapping("/by-email/{email}")
     public ResponseEntity<User> getUserByEmail(@PathVariable String email) {
