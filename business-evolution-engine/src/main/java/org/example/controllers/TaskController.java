@@ -56,7 +56,7 @@ public class TaskController {
 
     // ASSIGN USER : MANAGER et CHEF_D_EQUIPE sur leur projet
     @PutMapping("/{id}/assign")
-    @PreAuthorize("@taskService.canAssignTask(#id)")
+    @PreAuthorize("hasAnyRole('CHEF_D_EQUIPE')")
     public Task assignUser(@PathVariable Long id,
                            @RequestParam Long userId) {
         return taskService.assignUser(id, userId);
@@ -70,3 +70,4 @@ public class TaskController {
         taskService.delete(id);
     }
 }
+//role member fonctionne avec Task

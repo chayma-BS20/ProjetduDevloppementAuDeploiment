@@ -97,10 +97,19 @@ public class TaskService {
         // MANAGER → accès total
         if ("MANAGER".equals(role)) return true;
 
-        // CHEF_D_EQUIPE → uniquement pour les tâches de son équipe
-        return "CHEF_D_EQUIPE".equals(role) &&
-                currentUser.getTeam() != null &&
-                currentUser.getTeam().getTeamId().equals(task.getProject().getTeam().getTeamId());
+        // CHEF_D_EQUIPE → son équipe
+        if ("CHEF_D_EQUIPE".equals(role) || "Chef d equipe".equals(role)) {
+            return currentUser.getTeam() != null &&
+                    currentUser.getTeam().getTeamId().equals(task.getProject().getTeam().getTeamId());
+        }
+
+        // MEMBRE → même équipe que le projet
+        if ("MEMBRE".equals(role) || "Membre".equals(role)) {
+            return currentUser.getTeam() != null &&
+                    currentUser.getTeam().getTeamId().equals(task.getProject().getTeam().getTeamId());
+        }
+
+        return false;
     }
 
     // Vérifie si l'utilisateur peut assigner la tâche
