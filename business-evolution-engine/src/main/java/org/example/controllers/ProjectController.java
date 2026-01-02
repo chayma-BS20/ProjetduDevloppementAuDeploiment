@@ -62,3 +62,4 @@ public class ProjectController {
         projectService.delete(id);
     }
 }
+//projet fonctionnel avec role manager
