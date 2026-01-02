@@ -39,7 +39,7 @@ public class TeamController {
         return teamService.findTeamById(id).map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
     }
 
-    @PreAuthorize("hasRole('MANAGER')")
+    @PreAuthorize("hasAnyRole('MANAGER', 'CHEF D EQUIPE')")
     @PatchMapping("/{id}") public ResponseEntity<Team> updateTeam(@PathVariable Long id, @RequestBody Team teamDetails) {
         return ResponseEntity.ok(teamService.updateTeam(id, teamDetails));
     }
@@ -77,3 +77,4 @@ public class TeamController {
         return ResponseEntity.ok(teamService.addTeamMember(teamId, userId));
     }
 }
+//Role manager focntionnel avec team

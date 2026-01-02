@@ -34,14 +34,32 @@ public class TeamService {
     }
 
     public Team updateTeam(Long id, Team teamDetails) {
-        Optional<Team> optionalTeam = teamRepository.findById(id);
-        if (optionalTeam.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String email = auth.getName();
+        User currentUser = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Current user not found"));
+
+        Team team = teamRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Team not found"));
+
+        String dbRole = currentUser.getRole() != null ? currentUser.getRole().getTitle() : null;
+
+        if ("Manager".equals(dbRole)) {
+            Optional.ofNullable(teamDetails.getName()).ifPresent(team::setName);
+            Optional.ofNullable(teamDetails.getDescription()).ifPresent(team::setDescription);
+            return teamRepository.save(team);
         }
-        Team team = optionalTeam.get();
-        Optional.ofNullable(teamDetails.getName()).ifPresent(team::setName);
-        Optional.ofNullable(teamDetails.getDescription()).ifPresent(team::setDescription);
-        return teamRepository.save(team);
+
+        if (("CHEF D EQUIPE".equals(dbRole) || "Chef d equipe".equals(dbRole))
+                && currentUser.getTeam() != null
+                && currentUser.getTeam().getTeamId().equals(id)) {
+            Optional.ofNullable(teamDetails.getName()).ifPresent(team::setName);
+            Optional.ofNullable(teamDetails.getDescription()).ifPresent(team::setDescription);
+            return teamRepository.save(team);
+        }
+
+        throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+                "Role '" + dbRole + "' cannot update this team");
     }
 
     public boolean existsById(Long id) {
