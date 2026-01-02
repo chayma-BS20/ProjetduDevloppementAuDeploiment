@@ -54,7 +54,7 @@ public class ProjectController {
         return projectService.update(id, project, teamId);
     }
 
-    // DELETE: MANAGER full + owner check pour MEMBER/MANAGER
+    // DELETE: MANAGER full + owner check pour MEMBER/MANAGE
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PreAuthorize("hasRole('MANAGER')")
@@ -64,3 +64,4 @@ public class ProjectController {
 }
 //projet fonctionnel avec role manager
 //projet fonctionnel avec role membre
+//projet fonctionnel avec role chef d'equipe
