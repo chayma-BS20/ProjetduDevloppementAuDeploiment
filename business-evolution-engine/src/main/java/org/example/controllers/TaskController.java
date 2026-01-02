@@ -71,3 +71,4 @@ public class TaskController {
     }
 }
 //role member fonctionne avec Task
+//role manager fonctionnel avec Task
