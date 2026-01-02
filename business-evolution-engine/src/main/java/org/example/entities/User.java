@@ -12,6 +12,8 @@ import java.util.List;
 import org.example.entities.Task;
 import org.example.entities.Role;
 import org.example.entities.Team;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 @Entity
 @Table(name = "user")
@@ -37,6 +39,7 @@ public class User {
 
     @ManyToOne
     @JoinColumn(name = "team_id", nullable = true)
+    @OnDelete(action = OnDeleteAction.SET_NULL)
     @JsonProperty(access = JsonProperty.Access.READ_WRITE)
     private Team team;
 
