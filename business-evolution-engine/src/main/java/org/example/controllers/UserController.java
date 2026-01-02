@@ -128,4 +128,5 @@ public class UserController {
         Optional<User> user = userRepository.findByUsername(username);
         return user.map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
     }
+    //manager role ok
 }
