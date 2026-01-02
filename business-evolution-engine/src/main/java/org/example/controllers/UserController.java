@@ -129,4 +129,5 @@ public class UserController {
         return user.map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
     }
     //manager role ok
+    //chef equipe  role ok
 }
