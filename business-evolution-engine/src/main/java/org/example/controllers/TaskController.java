@@ -19,7 +19,7 @@ public class TaskController {
     // CREATE : MANAGER, CHEF_D_EQUIPE, MEMBRE
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    @PreAuthorize("hasAnyRole('CHEF_D_EQUIPE','MEMBRE')")
+    @PreAuthorize("hasAnyRole('CHEF D EQUIPE','MEMBRE')")
     public Task create(@RequestParam Long projectId,
                        @RequestBody Task task) {
         return taskService.create(task, projectId);
@@ -27,21 +27,21 @@ public class TaskController {
 
     // READ one : tous les rôles
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('MANAGER','CHEF_D_EQUIPE','MEMBRE')")
+    @PreAuthorize("hasAnyRole('MANAGER','CHEF D EQUIPE','MEMBRE')")
     public Task getById(@PathVariable Long id) {
         return taskService.getById(id);
     }
 
     // READ all : tous les rôles
     @GetMapping
-    @PreAuthorize("hasAnyRole('MANAGER','CHEF_D_EQUIPE','MEMBRE')")
+    @PreAuthorize("hasAnyRole('MANAGER','CHEF D EQUIPE','MEMBRE')")
     public List<Task> getAll() {
         return taskService.getAll();
     }
 
     // READ tasks by project : tous les rôles
     @GetMapping("/project/{projectId}")
-    @PreAuthorize("hasAnyRole('MANAGER','CHEF_D_EQUIPE','MEMBRE')")
+    @PreAuthorize("hasAnyRole('MANAGER','CHEF D EQUIPE','MEMBRE')")
     public List<Task> getByProject(@PathVariable Long projectId) {
         return taskService.getByProject(projectId);
     }
@@ -56,7 +56,7 @@ public class TaskController {
 
     // ASSIGN USER : MANAGER et CHEF_D_EQUIPE sur leur projet
     @PutMapping("/{id}/assign")
-    @PreAuthorize("hasAnyRole('CHEF_D_EQUIPE')")
+    @PreAuthorize("hasAnyRole('CHEF D EQUIPE')")
     public Task assignUser(@PathVariable Long id,
                            @RequestParam Long userId) {
         return taskService.assignUser(id, userId);
@@ -70,5 +70,6 @@ public class TaskController {
         taskService.delete(id);
     }
 }
-//role member fonctionne avec Task
+//role member fonctionnel avec Task
 //role manager fonctionnel avec Task
+//role chef de projet fonctionnel avec Task
