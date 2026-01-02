@@ -56,8 +56,6 @@ public class SecurityConfig {
                         // ✅ FIX : "ROLE_Chef d equipe" → hasRole('Chef d equipe')
                         .requestMatchers("/api/teams/**", "/api/projects/**").hasAnyRole("MANAGER", "CHEF D EQUIPE", "MEMBRE")
 
-                        // ✅ MEMBRES voient leur équipe
-                        .requestMatchers("/api/users/my-team", "/api/users/team/**").hasAnyRole("MANAGER", "CHEF D EQUIPE", "MEMBRE")
 
                         .anyRequest().authenticated()
                 )
