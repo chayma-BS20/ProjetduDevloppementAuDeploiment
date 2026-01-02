@@ -82,3 +82,4 @@ public class RoleController {
     }
 }
 // membre et chef d'equipe foncionnel
+//role manager fonctionnel
