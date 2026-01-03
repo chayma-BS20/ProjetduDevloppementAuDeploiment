@@ -1,23 +1,14 @@
 package org.example.controllers;
 
 import org.example.entities.User;
-import org.example.entities.Role;
-import org.example.entities.Team;
-import org.example.repositories.UserRepository;
-import org.example.repositories.RoleRepository;
-import org.example.repositories.TeamRepository;
+import org.example.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import java.util.Collections;
+
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/users")
@@ -25,109 +16,62 @@ import java.util.Optional;
 public class UserController {
 
     @Autowired
-    private UserRepository userRepository;
-    @Autowired
-    private RoleRepository roleRepository;
-    @Autowired
-    private TeamRepository teamRepository;
+    private UserService userService;
 
-    // ✅ MANAGER UNIQUEMENT (CRUD total)
+    // ================= CREATE =================
     @PreAuthorize("hasRole('MANAGER')")
     @PostMapping("/addUser")
     public ResponseEntity<User> createUser(@RequestBody User user) {
-        if (userRepository.existsByEmail(user.getEmail()) ||
-                userRepository.existsByUsername(user.getUsername())) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).build();
-        }
-
-        Role finalRole = null;
-        if (user.getRole() != null && user.getRole().getRoleId() != null) {
-            finalRole = roleRepository.findById(user.getRole().getRoleId())
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Role not found"));
-            user.setRole(finalRole);
-        }
-
-        if (user.getTeam() != null && user.getTeam().getTeamId() != null) {
-            Team team = teamRepository.findById(user.getTeam().getTeamId())
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Team not found"));
-            user.setTeam(team);
-        }
-
-        // ✅ LOGIQUE MANAGER : pas d'équipe
-        if (finalRole != null && ("MANAGER".equals(finalRole.getTitle()) || "MANAGER".equals(finalRole.getTitle()))) {
-            user.setTeam(null);
-        }
-
-        if (user.getPassword() != null && !user.getPassword().isEmpty()) {
-            user.setPassword(new BCryptPasswordEncoder().encode(user.getPassword()));
-        }
-
-        User savedUser = userRepository.save(user);
+        User savedUser = userService.createUser(user);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedUser);
     }
 
+    // ================= READ =================
     @PreAuthorize("hasRole('MANAGER')")
     @GetMapping
     public List<User> getAllUsers() {
-        return userRepository.findAll();
+        return userService.getAllUsers();
     }
 
     @PreAuthorize("hasRole('MANAGER')")
     @GetMapping("/{id}")
     public ResponseEntity<User> getUserById(@PathVariable Long id) {
-        Optional<User> user = userRepository.findById(id);
-        return user.map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
-    }
-
-    @PreAuthorize("hasRole('MANAGER')")
-    @PatchMapping("/{id}")
-    public ResponseEntity<User> partialUpdateUser(@PathVariable Long id, @RequestBody User userDetails) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-
-        if (userDetails.getUsername() != null) user.setUsername(userDetails.getUsername());
-        if (userDetails.getEmail() != null) user.setEmail(userDetails.getEmail());
-        if (userDetails.getPhoneNumber() != null) user.setPhoneNumber(userDetails.getPhoneNumber());
-        if (userDetails.getAddress() != null) user.setAddress(userDetails.getAddress());
-
-        if (userDetails.getRole() != null && userDetails.getRole().getRoleId() != null) {
-            Role role = roleRepository.findById(userDetails.getRole().getRoleId())
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Role not found"));
-            user.setRole(role);
-        }
-
-        if (userDetails.getTeam() != null && userDetails.getTeam().getTeamId() != null) {
-            Team team = teamRepository.findById(userDetails.getTeam().getTeamId())
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Team not found"));
-            user.setTeam(team);
-        }
-
-        return ResponseEntity.ok(userRepository.save(user));
-    }
-
-    @PreAuthorize("hasRole('MANAGER')")
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
-        if (!userRepository.existsById(id)) {
-            return ResponseEntity.notFound().build();
-        }
-        userRepository.deleteById(id);
-        return ResponseEntity.noContent().build();
+        return userService.getUserById(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
     @PreAuthorize("hasRole('MANAGER')")
     @GetMapping("/by-email/{email}")
     public ResponseEntity<User> getUserByEmail(@PathVariable String email) {
-        Optional<User> user = userRepository.findByEmail(email);
-        return user.map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
+        return userService.getUserByEmail(email)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
     @PreAuthorize("hasRole('MANAGER')")
     @GetMapping("/by-username/{username}")
     public ResponseEntity<User> getUserByUsername(@PathVariable String username) {
-        Optional<User> user = userRepository.findByUsername(username);
-        return user.map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
+        return userService.getUserByUsername(username)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
-    //manager role ok
-    //chef equipe  role ok
+
+    // ================= UPDATE =================
+    @PreAuthorize("hasRole('MANAGER')")
+    @PatchMapping("/{id}")
+    public ResponseEntity<User> partialUpdateUser(@PathVariable Long id,
+                                                  @RequestBody User userDetails) {
+        return ResponseEntity.ok(
+                userService.partialUpdateUser(id, userDetails)
+        );
+    }
+
+    // ================= DELETE =================
+    @PreAuthorize("hasRole('MANAGER')")
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
+        userService.deleteUser(id);
+        return ResponseEntity.noContent().build();
+    }
 }
