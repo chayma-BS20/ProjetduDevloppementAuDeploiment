@@ -1,0 +1,44 @@
+<div class="sidebar d-flex flex-column flex-shrink-0 p-3 bg-light h-100 border-end">
+    <a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto link-dark text-decoration-none">
+        <fa-icon [icon]="faTrello" class="me-2" size="3x"></fa-icon>
+        <span class="fs-4">Kanban</span>
+    </a>
+    <p class="my-3 text-small">All boards ({{boardsCount}})</p>
+
+    <ul class="nav nav-pills flex-column">
+        
+        <li class="nav-item mb-2" *ngFor="let board of boards">
+            <button type="button" class="nav-link" [class.active]="activeBoardId === board.id" aria-current="page" (click)="setActiveBoard(board.id)" [attr.pressed]="activeBoardId === board.id">
+                <fa-icon [icon]="faTrello" class="me-2"></fa-icon>
+                {{board.name}}
+            </button>
+        </li>
+    </ul>
+    <hr />
+    <p>
+        <button type="button" class="btn btn-link" type="button" data-bs-toggle="modal" data-bs-target="#newBoard" aria-label="add a new board">+ Create new board</button>
+    </p>    
+</div>
+
+<div class="modal fade" tabindex="-1" id="newBoard" aria-labelledby="newBoardLabel">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" role="heading" aria-level="5" >Add a Board</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close modal"></button>
+            </div>
+            <div class="modal-body">
+                <form #f="ngForm" (ngSubmit)="addBoard(f)">
+                    <div class="input-group mb-3">
+                        <label class="label me-3" aria-label="Name of Board">Name of Board</label>
+                        <input type="text" class="form-control" placeholder="Board name" aria-label="Board name" name="boardName"  ngModel/>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" aria-label="Close">Close</button>
+                        <button class="btn btn-primary" aria-label="Save changes">Save changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
