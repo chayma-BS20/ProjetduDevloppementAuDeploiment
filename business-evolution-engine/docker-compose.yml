@@ -27,7 +27,7 @@ services:
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: root
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
-      SPRING_JPA_DATABASE_PLATFORM: org.hibernate.dialect.MySQLDialect  # Utilisez MySQLDialect (non déprécié)
+      SPRING_JPA_DATABASE_PLATFORM: org.hibernate.dialect.MySQLDialect  
 
 volumes:
   mysql_data:
