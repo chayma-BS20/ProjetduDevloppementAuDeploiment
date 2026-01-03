@@ -20,7 +20,6 @@ public class RoleService {
     @Autowired
     private UserRepository userRepository;
 
-    // ================= CREATE =================
     public Role createRole(Role role) {
         if (roleRepository.existsByTitle(role.getTitle())) {
             throw new ResponseStatusException(HttpStatus.CONFLICT);
@@ -28,7 +27,6 @@ public class RoleService {
         return roleRepository.save(role);
     }
 
-    // ================= READ =================
     public List<Role> getAllRoles() {
         return roleRepository.findAll();
     }
@@ -41,7 +39,6 @@ public class RoleService {
         return roleRepository.findByTitle(title);
     }
 
-    // ================= UPDATE =================
     public Role updateRole(Long id, Role roleDetails) {
         Role role = roleRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
@@ -52,7 +49,6 @@ public class RoleService {
         return roleRepository.save(role);
     }
 
-    // ================= DELETE =================
     public void deleteRole(Long id) {
         if (!roleRepository.existsById(id)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);

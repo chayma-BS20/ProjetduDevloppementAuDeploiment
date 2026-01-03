@@ -18,15 +18,14 @@ public class RoleController {
     @Autowired
     private RoleService roleService;
 
-    // ================= CREATE =================
     @PostMapping
-    @PreAguthorize("hasRole('MANAGER')")
+    @PreAuthorize("hasRole('MANAGER')")
     public ResponseEntity<Role> createRole(@RequestBody Role role) {
         Role savedRole = roleService.createRole(role);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedRole);
     }
 
-    // ================= READ =================
+
     @GetMapping
     @PreAuthorize("hasRole('MANAGER')")
     public List<Role> getAllRoles() {
@@ -49,7 +48,6 @@ public class RoleController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    // ================= UPDATE =================
     @PatchMapping("/{id}")
     @PreAuthorize("hasRole('MANAGER')")
     public ResponseEntity<Role> updateRole(@PathVariable Long id,
@@ -59,7 +57,6 @@ public class RoleController {
         );
     }
 
-    // ================= DELETE =================
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('MANAGER')")
     public ResponseEntity<Void> deleteRole(@PathVariable Long id) {

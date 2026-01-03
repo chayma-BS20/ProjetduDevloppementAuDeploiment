@@ -27,7 +27,6 @@ public class UserService {
     @Autowired
     private TeamRepository teamRepository;
 
-    // ================= CREATE =================
     public User createUser(User user) {
 
         if (userRepository.existsByEmail(user.getEmail()) ||
@@ -59,7 +58,6 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    // ================= READ =================
     public List<User> getAllUsers() {
         return userRepository.findAll();
     }
@@ -76,7 +74,6 @@ public class UserService {
         return userRepository.findByUsername(username);
     }
 
-    // ================= UPDATE =================
     public User partialUpdateUser(Long id, User userDetails) {
 
         User user = userRepository.findById(id)
@@ -102,7 +99,6 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    // ================= DELETE =================
     public void deleteUser(Long id) {
         if (!userRepository.existsById(id)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);

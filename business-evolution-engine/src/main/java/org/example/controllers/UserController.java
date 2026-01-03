@@ -18,7 +18,6 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    // ================= CREATE =================
     @PreAuthorize("hasRole('MANAGER')")
     @PostMapping("/addUser")
     public ResponseEntity<User> createUser(@RequestBody User user) {
@@ -26,7 +25,6 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.CREATED).body(savedUser);
     }
 
-    // ================= READ =================
     @PreAuthorize("hasRole('MANAGER')")
     @GetMapping
     public List<User> getAllUsers() {
@@ -57,7 +55,6 @@ public class UserController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    // ================= UPDATE =================
     @PreAuthorize("hasRole('MANAGER')")
     @PatchMapping("/{id}")
     public ResponseEntity<User> partialUpdateUser(@PathVariable Long id,
@@ -67,7 +64,6 @@ public class UserController {
         );
     }
 
-    // ================= DELETE =================
     @PreAuthorize("hasRole('MANAGER')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
