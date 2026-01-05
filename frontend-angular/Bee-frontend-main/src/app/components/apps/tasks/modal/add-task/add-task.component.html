@@ -35,7 +35,7 @@
         <label for="task-description">Description</label>
         <textarea class="form-control" id="task-description" rows="4" [(ngModel)]="task.description" name="description" required></textarea>
       </div>
-      <!-- Champ caché pour l'ID de la tâche -->
+     
       <input type="hidden" name="taskId" [value]="task.id">
       <button class="btn btn-secondary me-1" id="Bookmark" type="submit">Save</button>
       <button class="btn btn-primary" type="button" data-dismiss="modal">Cancel</button>
