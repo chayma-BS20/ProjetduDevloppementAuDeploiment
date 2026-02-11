@@ -90,8 +90,8 @@ Endpoints et actions autorisées :
 /api/teams/** → créer et mettre à jour son équipe, consulter les membres
 
 Limitations :
+- Ne peut pas créer ou supprimer des utilisateurs ou des rôles
 
-Ne peut pas créer ou supprimer des utilisateurs ou des rôles
 
 3️⃣ Membre
 
@@ -110,82 +110,148 @@ Limitations :
 Ne peut pas modifier d’autres utilisateurs, rôles, projets ou tâches
 
 
+# 🔧 Tester l’application avec Docker
+
+## 1️⃣ Prérequis
+
+Avant de commencer, assurez-vous d’avoir :  
+
+- **Docker** et **Docker Compose** installés  
+- **Git** pour cloner le projet  
+- **Postman** ou un outil similaire pour tester les API  
+
+---
+
+## 2️⃣ Récupérer le projet et les images Docker
+
+### Étape 1 : Cloner le projet
+
+Ouvrez un terminal (CMD ou PowerShell) et exécutez :
+
+- git clone https://github.com/chayma-BS20/ProjetduDevloppementAuDeploiment.git
+- cd business-evolution-engine
+
+Vous êtes maintenant dans le dossier du projet.
+
+### Étape 2 : Télécharger les images Docker
+
+Toujours dans le terminal, exécutez :
+
+- docker pull chayma2012/bee-backend:latest
+- docker pull chayma2012/bee-mysql:latest
+
+Cela télécharge les images backend et base de données depuis Docker Hub.
 
 
-🔧 Tester l’application avec Docker
+3️⃣ Lancer l’application avec Docker Compose
 
-1️⃣ Prérequis
+### Étape 3 : Démarrer les services
 
-Docker et Docker Compose installés
-Git pour cloner le projet
+Dans le terminal, exécutez :
 
-2️⃣ Récupérer le projet et les images
-# Cloner le repo GitHub
-git clone https://github.com/chayma-BS20/ProjetduDevloppementAuDeploiment.git
-cd business-evolution-engine
+- docker-compose up --build
 
-# Télécharger les images Docker déjà construites
-docker pull chayma2012/bee-backend:latest
-docker pull chayma2012/bee-mysql:latest
+La base de données MySQL sera accessible sur localhost:3307 (BDD : bee_db)
 
-3️⃣ Lancer l’application
-# Lancer l’ensemble des services avec Docker Compose
-docker-compose up --build
+L’API backend sera accessible sur localhost:8081
 
+⚡ Pour lancer uniquement le backend sans Docker Compose :
 
-MySQL sera accessible sur localhost:3307 (BDD : bee_db)
+- docker run -p 8081:8081 chayma2012/bee-backend:latest
 
-API Backend sur localhost:8081
+4️⃣ Se connecter et tester avec Postman
+### Étape 4 : Authentification du Manager
 
-⚡ Pour tester uniquement le backend sans Docker Compose :
+1) Ouvrez Postman
 
-docker run -p 8081:8081 chayma2012/bee-backend:latest
+2) Créez une requête POST vers :
 
-4️⃣ Tester avec Postman
-Authentification
-
-Envoyer une requête POST pour se connecter :
-
-POST /api/auth/login
+POST http://localhost:8081/api/auth/login
 Content-Type: application/json
-
-
-Body :
-
+Dans le corps (body) de la requête, mettez :
 {
   "email": "manager@bee.com",
-  "password": "password123"
+  "password": "admin123"
+}
+
+3) Envoyez la requête
+
+Vous recevrez un JWT token dans la réponse
+
+Ce token vous permettra d’accéder aux endpoints sécurisés.
+###  !! Attention : ce token expire après 30 minutes. !!
+
+
+### Étape 5 : Ajouter le token à Postman
+
+Dans l’onglet Headers de vos requêtes sécurisées :
+
+Key: Authorization
+Value: Bearer <JWT_TOKEN>
+
+Remplacez <JWT_TOKEN> par le token obtenu lors de la connexion.
+
+
+5️⃣ Tester les endpoints selon les rôles
+
+
+| Rôle          | Exemple d’action                                                    |
+| ------------- | ------------------------------------------------------------------- |
+| Manager       | `POST /api/users/addUser` → créer un utilisateur                    |
+| Chef d’équipe | `POST /api/projects?teamId=1` → créer un projet pour son équipe     |
+| Membre        | `GET /api/tasks/project/1` → voir les tâches assignées à son projet |
+
+
+Pour vérifier les restrictions :
+Essayez d’accéder à un endpoint non autorisé pour un rôle → vous devriez obtenir 403 Forbidden.
+
+6️⃣ Créer d’autres utilisateurs
+Utilisez l’endpoint POST /api/users/addUser
+Remplissez tous les champs requis dans le body de la requête
+N’oubliez pas d’inclure le token du Manager dans l’en-tête Authorization
+Cela permet de créer des utilisateurs avec différents rôles (Manager, Chef d’équipe, Membre).
+
+### Exemple de création d’une équipe  via POST `/api/teams`
+POST http://localhost:8081/api/teams
+Content-Type: application/json
+
+{
+    "name": "Team Orion",
+    "description": "Équipe chargée du projet Orion"
+}
+
+### Exemple de création d’un utilisateur via POST `/api/users`
+Roles existants par defaut
+#### Rôle des `roleId` :
+- `roleId: 1` → MANAGER  
+- `roleId: 2` → CHEF D'ÉQUIPE  
+- `roleId: 3` → MEMBRE
+
+#### Exemple : création d’un membre fictif
+
+**Request Body :**
+
+JSON
+{
+  "username": "test_membre",
+  "email": "test@equipe2.com",
+  "password": "password123",
+  "phoneNumber": "+3312457896",
+  "address": "Paris",
+  "role": { "roleId": 3 }, // MEMBRE
+  "team": { "teamId": 1 } // Remplacer par l'id de l'equipe que vous venzez de créer 
 }
 
 
-Le serveur retourne un JWT token. Pour toutes les requêtes aux endpoints sécurisés, ajouter dans l’en-tête :
+7️⃣ Liens Docker Hub
 
-Authorization: Bearer <JWT_TOKEN>
+- Backend : chayma2012/bee-backend
+- MySQL : chayma2012/bee-mysql
 
 
-
-****Exemples d’accès selon le rôle: 
-
-Rôle	            Exemple d’action
-Manager  	        POST /api/users/addUser → créer un utilisateur
-Chef d’équipe    	POST /api/projects?teamId=1 → créer un projet pour son équipe
-Membre	          GET /api/tasks/project/1 → voir les tâches assignées à son projet
-
-💡 Pour tester les restrictions :
-Essayez d’accéder à un endpoint non autorisé pour un rôle → vous devriez obtenir 403 Forbidden.
-
-5️⃣ Liens Docker Hub
-
-Backend : chayma2012/bee-backend
-
-MySQL : chayma2012/bee-mysql
-
-✅ Procédure rapide pour tester :
-
+✅ Procédure rapide pour tester l’application
 Cloner le repo GitHub
-
-Télécharger les images (docker pull ...)
-
-Lancer docker-compose up --build
-
-Tester les endpoints via Postman selon le rôle
+Télécharger les images Docker (docker pull ...)
+Lancer les services avec docker-compose up --build
+Se connecter avec Postman (Manager)
+Tester les endpoints selon le rôle
