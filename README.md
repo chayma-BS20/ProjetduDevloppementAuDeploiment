@@ -109,12 +109,48 @@ Limitations :
 
 Ne peut pas modifier d’autres utilisateurs, rôles, projets ou tâches
 
-🔧 Tester l’application
 
-Authentification avec Postman :
+
+
+🔧 Tester l’application avec Docker
+
+1️⃣ Prérequis
+
+Docker et Docker Compose installés
+Git pour cloner le projet
+
+2️⃣ Récupérer le projet et les images
+# Cloner le repo GitHub
+git clone https://github.com/chayma-BS20/ProjetduDevloppementAuDeploiment.git
+cd business-evolution-engine
+
+# Télécharger les images Docker déjà construites
+docker pull chayma2012/bee-backend:latest
+docker pull chayma2012/bee-mysql:latest
+
+3️⃣ Lancer l’application
+# Lancer l’ensemble des services avec Docker Compose
+docker-compose up --build
+
+
+MySQL sera accessible sur localhost:3307 (BDD : bee_db)
+
+API Backend sur localhost:8081
+
+⚡ Pour tester uniquement le backend sans Docker Compose :
+
+docker run -p 8081:8081 chayma2012/bee-backend:latest
+
+4️⃣ Tester avec Postman
+Authentification
+
+Envoyer une requête POST pour se connecter :
 
 POST /api/auth/login
 Content-Type: application/json
+
+
+Body :
 
 {
   "email": "manager@bee.com",
@@ -122,45 +158,34 @@ Content-Type: application/json
 }
 
 
-Le token JWT obtenu doit être inclus dans l’en-tête Authorization pour tous les endpoints sécurisés :
+Le serveur retourne un JWT token. Pour toutes les requêtes aux endpoints sécurisés, ajouter dans l’en-tête :
 
 Authorization: Bearer <JWT_TOKEN>
 
 
-Exemples d’accès selon le rôle :
 
-Rôle	Exemple d’action
-Manager	POST /api/users/addUser → créer un utilisateur
-Chef d’équipe	POST /api/projects?teamId=1 → créer un projet pour son équipe
-Membre	GET /api/tasks/project/1 → voir les tâches de son projet
+****Exemples d’accès selon le rôle: 
 
-Tester les restrictions :
+Rôle	            Exemple d’action
+Manager  	        POST /api/users/addUser → créer un utilisateur
+Chef d’équipe    	POST /api/projects?teamId=1 → créer un projet pour son équipe
+Membre	          GET /api/tasks/project/1 → voir les tâches assignées à son projet
 
-Essayer d’accéder à un endpoint interdit pour un rôle → réponse 403 Forbidden attendue.
+💡 Pour tester les restrictions :
+Essayez d’accéder à un endpoint non autorisé pour un rôle → vous devriez obtenir 403 Forbidden.
 
-🐳 Lancer l’application avec Docker
+5️⃣ Liens Docker Hub
 
-Docker Compose :
+Backend : chayma2012/bee-backend
 
-docker-compose up --build
+MySQL : chayma2012/bee-mysql
 
-
-MySQL : localhost:3307 (BDD : bee_db)
-
-API Backend : localhost:8081
-
-- Backend : https://hub.docker.com/r/chayma2012/bee-backend
-- MySQL   : https://hub.docker.com/r/chayma2012/bee-mysql
-
-Standalone :
-docker run -p 8081:8081 chayma2012/bee-backend:latest
-
-
-
-Procédure rapide :
+✅ Procédure rapide pour tester :
 
 Cloner le repo GitHub
 
+Télécharger les images (docker pull ...)
+
 Lancer docker-compose up --build
 
-Tester les endpoints selon le rôle avec Postman
+Tester les endpoints via Postman selon le rôle

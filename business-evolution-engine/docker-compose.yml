@@ -1,12 +1,25 @@
+version: '3.8'
+
 services:
   mysql:
-    image: chayma2012/bee-mysql:latest  
-    ports: ["3307:3306"]
-    volumes: [mysql_data:/var/lib/mysql]
+    image: chayma2012/bee-mysql:latest
+    ports:
+      - "3307:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: bee_db
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-proot"]
+      interval: 10s
+      timeout: 20s
+      retries: 10
 
   backend:
     image: chayma2012/bee-backend:latest
-    ports: [ "8081:8081" ]
+    ports:
+      - "8081:8081"
     depends_on:
       mysql:
         condition: service_healthy
@@ -14,7 +27,6 @@ services:
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/bee_db
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: root
-
 
 volumes:
   mysql_data:
